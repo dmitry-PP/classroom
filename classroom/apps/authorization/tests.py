@@ -35,3 +35,6 @@ class IsVerifiedPermissionTest(TestCase):
         request = self.factory.get('/')
         request.user = self.anonymous_user
         self.assertFalse(self.permission.has_permission(request, None))
+
+
+# python manage.py test apps.authorization - запуск теста
