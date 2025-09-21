@@ -25,11 +25,11 @@ class Courses(models.Model):
         NOT_DELETE = 2, _('Not delete')
 
     title = models.CharField(_("title"), max_length=100)
-    description = models.TextField(_("description"))
-    section = models.CharField(_("section"), max_length=50)
-    room = models.CharField(_("room"), max_length=50)
-    theme = models.CharField(_("theme"), max_length=50)
-    inv_code = models.CharField(_("invite code"), max_length=8)
+    description = models.TextField(_("description"), blank=True, null=True)
+    section = models.CharField(_("section"), max_length=50, blank=True, null=True)
+    room = models.CharField(_("room"), max_length=20, blank=True, null=True)
+    theme = models.CharField(_("theme"), max_length=25, blank=True, null=True)
+    inv_code = models.CharField(_("invite code"), max_length=8, blank=True, null=True)
     course_id_base = models.CharField(_("course id"), unique=True, max_length=32)
     config_permission = models.PositiveSmallIntegerField(
         _("config perm"),
@@ -50,7 +50,9 @@ class Courses(models.Model):
     )
     image = models.ImageField(
         _("course image"),
-        upload_to=partial(file_upload_path, "course", directory="courses")
+        upload_to=partial(file_upload_path, "course", directory="courses"),
+        blank=True,
+        null=True
     )
     created_at = models.DateTimeField(_("created_at"), auto_now_add=True)
     is_archive = models.BooleanField(_("archive"), default=False)
@@ -111,14 +113,15 @@ class Courses(models.Model):
 
     def save(self, *args, **kwargs):
         # Генерируем поля только для новых объектов
-        if self.pk == None:
-            self.inv_code = generate_random_string(
-                self._meta.get_field('inv_code').max_length,
-                use_upper_case=False
-            )
+        if self.pk is None:
+            # Генерируем inv_code только если он не указан
+            if not self.inv_code:
+                self.inv_code = generate_random_string(
+                    self._meta.get_field('inv_code').max_length,
+                    use_upper_case=False
+                )
 
             for attempt in range(self.MAX_ATTEMPTS_GENERATE_COURSE_ID):
-
                 self.course_id_base = generate_random_string(
                     self._meta.get_field('course_id_base').max_length
                 )
@@ -127,7 +130,7 @@ class Courses(models.Model):
                     continue
                 break
 
-            if self.course_id_base == None:
+            if self.course_id_base is None:
                 raise ValueError("Something went wrong, please try again.")
 
         return super().save(*args, **kwargs)
@@ -167,7 +170,7 @@ class CourseTeachersThrough(ActionMixin, models.Model):
     )
 
     invited_at = models.DateTimeField(_("invited_at"), auto_now_add=True)
-    accepted_at = models.DateTimeField(_("accepted_at"), default=None)
+    accepted_at = models.DateTimeField(_("accepted_at"), null=True, blank=True, default=None)
     status = models.CharField(_("status"), choices=Status, default=Status.PENDING, max_length=20)
 
     class Meta:
@@ -190,7 +193,7 @@ class CourseStudentsThrough(ActionMixin, models.Model):
     )
 
     invited_at = models.DateTimeField(_("invited_at"), auto_now_add=True)
-    accepted_at = models.DateTimeField(_("accepted_at"), default=None)
+    accepted_at = models.DateTimeField(_("accepted_at"), null=True, blank=True, default=None)
     status = models.CharField(_("status"), choices=Status, default=Status.PENDING, max_length=20)
 
     class Meta:
