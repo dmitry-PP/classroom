@@ -42,6 +42,19 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             "Unselect this instead of deleting accounts."
         ),
     )
+
+    verification_code = models.CharField(
+        _("verification code"),
+        max_length=6,
+        blank=True,
+        null=True
+    )
+    verification_code_sent_at = models.DateTimeField(
+        _("verification code sent at"),
+        null=True,
+        blank=True
+    )
+    
     is_verified = models.BooleanField(_("verify"), default=False)
     created_at = models.DateTimeField(_("created_at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated_at"), auto_now=True)
