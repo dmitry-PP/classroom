@@ -15,13 +15,6 @@ def generate_random_string(length, use_upper_case=True, use_digits=True):
         characters += string.digits
     return ''.join(random.choice(characters) for _ in range(length))
 
-def generate_verification_code(length=6):
-    return generate_random_string(
-        length=length,
-        use_upper_case=False,
-        use_digits=True
-    )
-
 def is_verification_code_expired(sent_at):
     if not sent_at:
         return True
