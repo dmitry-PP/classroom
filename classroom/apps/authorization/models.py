@@ -3,6 +3,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, AbstractUser
+from django.conf import settings
 
 from functools import partial
 
@@ -41,18 +42,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             "Designates whether this user should be treated as active. "
             "Unselect this instead of deleting accounts."
         ),
-    )
-
-    verification_code = models.CharField(
-        _("verification code"),
-        max_length=6,
-        blank=True,
-        null=True
-    )
-    verification_code_sent_at = models.DateTimeField(
-        _("verification code sent at"),
-        null=True,
-        blank=True
     )
     
     is_verified = models.BooleanField(_("verify"), default=False)
@@ -100,3 +89,31 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+
+class VerifiedCodesModel(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        related_name="verification_code",
+        verbose_name=_("user"),
+        on_delete=models.CASCADE
+    )
+    code = models.CharField(_("verification code"), max_length=6)
+    sent_at = models.DateTimeField(_("sent at"), auto_now_add=True)
+    expire_at = models.DateTimeField(_("expire at"))
+
+    class Meta:
+        verbose_name = _("Verification Code")
+        verbose_name_plural = _("Verification Codes")
+
+    def is_expired(self):
+        """Проверяет истек ли срок действия кода"""
+        from django.utils import timezone
+        return timezone.now() > self.expire_at
+
+    def save(self, *args, **kwargs):
+        if not self.expire_at:
+            from django.utils import timezone
+            from datetime import timedelta
+            self.expire_at = timezone.now() + timedelta(minutes=10)
+        super().save(*args, **kwargs)
