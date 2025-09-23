@@ -15,13 +15,6 @@ def generate_random_string(length, use_upper_case=True, use_digits=True):
         characters += string.digits
     return ''.join(random.choice(characters) for _ in range(length))
 
-def is_verification_code_expired(sent_at):
-    if not sent_at:
-        return True
-    expiration_time = sent_at + timedelta(minutes=10)
-    return timezone.now() > expiration_time
-
-
 def file_upload_path(prefix, instance, filename, directory=None):
     ext = filename.split('.')[-1]
     filename = f"{prefix}_{generate_random_string(10)}.{ext}"
