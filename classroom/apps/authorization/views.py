@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from .serializers import LoginUserSerializer, UserProfileSerializer
 
 from django.utils import timezone
-from apps.utils import is_verification_code_expired
+from .models import CustomUser, VerifiedCodesModel
 
 
 class LoginView(generics.GenericAPIView):
@@ -59,22 +59,24 @@ def verify_email(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    if not user.verification_code or user.verification_code != code:
+    try:
+        verification_code = VerifiedCodesModel.objects.get(user=user, code=code)
+    except VerifiedCodesModel.DoesNotExist:
         return Response(
             {'error': 'Неверный код верификации'},
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    if is_verification_code_expired(user.verification_code_sent_at):
+    if verification_code.is_expired():
+        verification_code.delete()
         return Response(
             {'error': 'Срок действия кода истек'},
             status=status.HTTP_400_BAD_REQUEST
         )
     
     user.is_verified = True
-    user.verification_code = None 
-    user.verification_code_sent_at = None
     user.save()
+    verification_code.delete() 
     
     return Response(
         {'message': 'Email успешно верифицирован'},
