@@ -149,11 +149,22 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-REST_FRAMEWORK = {
+"""REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination', # Pagination
     'PAGE_SIZE': 20,
     'DEFAULT_PERMISSION_CLASSES': [
         'apps.authorization.permissions.IsVerified',  # Verification
+    ],
+}"""
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',  # Для тестирования
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # Временно для тестирования
     ],
 }
 
