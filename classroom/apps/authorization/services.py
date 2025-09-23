@@ -2,21 +2,25 @@ from django.core.mail import send_mail
 from django.conf import settings
 from apps.utils import generate_random_string
 from django.utils import timezone
+from .models import VerifiedCodesModel
 
 def send_verification_email(user):
-    verification_code = generate_random_string(
+    code = generate_random_string(
         length=6, 
         use_upper_case=False, 
-        use_digits=True
+        use_digits=True,
     )
     
-    user.verification_code = verification_code
-    user.verification_code_sent_at = timezone.now()
-    user.save()
+    VerifiedCodesModel.objects.filter(user=user).delete()
+    
+    verification_code = VerifiedCodesModel.objects.create(
+        user=user,
+        code=code
+    )
     
     subject = 'Код верификации аккаунта'
     message = f'''
-    Ваш код для верификации аккаунта: {verification_code}
+    Ваш код для верификации аккаунта: {code}
     
     Код действителен в течение 10 минут.
     
@@ -31,4 +35,4 @@ def send_verification_email(user):
         fail_silently=False,
     )
     
-    return verification_code
+    return code
