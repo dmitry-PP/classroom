@@ -2,7 +2,50 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
-from .models import CustomUser
+from .models import CustomUser, VerifiedCodesModel
+
+
+@admin.register(VerifiedCodesModel)
+class VerifiedCodesModelAdmin(admin.ModelAdmin):
+    list_display = [
+        'user_email',
+        'code', 
+        'sent_at',
+        'expire_at',
+        'is_expired_display'
+    ]
+    
+    list_filter = [
+        'sent_at',
+        'expire_at'
+    ]
+    
+    search_fields = [
+        'user__email',
+        'user__first_name', 
+        'user__second_name',
+        'code'
+    ]
+    
+    readonly_fields = ['sent_at', 'expire_at']
+    
+    fieldsets = (
+        (None, {
+            'fields': ('user', 'code')
+        }),
+        (_('Timestamps'), {
+            'fields': ('sent_at', 'expire_at')
+        }),
+    )
+    
+    def user_email(self, obj):
+        return obj.user.email
+    user_email.short_description = _('User Email')
+    
+    def is_expired_display(self, obj):
+        return obj.is_expired()
+    is_expired_display.short_description = _('Is Expired')
+    is_expired_display.boolean = True
 
 
 @admin.register(CustomUser)
@@ -62,7 +105,8 @@ class CustomUserAdmin(UserAdmin):
         (_('Important dates'), {
             'fields': (
                 'created_at',
-                'updated_at'
+                'updated_at',
+                'verification_code_link' # код верификации
             )
         }),
     )
@@ -87,6 +131,14 @@ class CustomUserAdmin(UserAdmin):
 
     # Действия в админке
     actions = ['verify_users', 'unverify_users', 'activate_users', 'deactivate_users']
+
+    def verification_code_link(self, obj):
+        try:
+            code_obj = obj.verification_code
+            return f"Code: {code_obj.code} (expires: {code_obj.expire_at})"
+        except VerifiedCodesModel.DoesNotExist:
+            return "No verification code"
+    verification_code_link.short_description = _('Verification Code')
 
     def verify_users(self, request, queryset):
         """Верифицировать выбранных пользователей"""
