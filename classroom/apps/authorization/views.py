@@ -9,7 +9,6 @@ from .serializers import LoginUserSerializer, UserProfileSerializer
 
 from django.utils import timezone
 from apps.utils import is_verification_code_expired
-from .services import send_verification_email
 
 
 class LoginView(generics.GenericAPIView):
@@ -21,15 +20,12 @@ class LoginView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
 
-        if not user.is_verified:
-            print(f"Отправляем код верификации для {user.email}")
-            send_verification_email(user)
-
         login(request, user)
 
         return Response({
             'user': UserProfileSerializer(user).data,
-            'message': 'Код верификации отправлен на email' if not user.is_verified else 'Успешный вход'
+            'message': 'Успешный вход',
+            'requires_verification': not user.is_verified  
         }, status=status.HTTP_200_OK)
 
 
@@ -84,3 +80,37 @@ def verify_email(request):
         {'message': 'Email успешно верифицирован'},
         status=status.HTTP_200_OK
     )
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def request_verification_code(request):
+    from .services import send_verification_email
+    
+    email = request.data.get('email')
+    
+    if not email:
+        return Response(
+            {'error': 'Email обязателен'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        user = CustomUser.objects.get(email=email)
+    except CustomUser.DoesNotExist:
+        return Response(
+            {'error': 'Пользователь не найден'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    if not user.is_verified:
+        send_verification_email(user)
+        return Response(
+            {'message': 'Код верификации отправлен на email'},
+            status=status.HTTP_200_OK
+        )
+    else:
+        return Response(
+            {'message': 'Пользователь уже верифицирован'},
+            status=status.HTTP_200_OK
+        )
