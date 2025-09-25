@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
-from .models import CustomUser, VerifiedCodesModel
+from .models import CustomUser, VerifiedCodesModel, PasswordResetCodesModel
 
 
 @admin.register(VerifiedCodesModel)
@@ -37,6 +37,38 @@ class VerifiedCodesModelAdmin(admin.ModelAdmin):
             'fields': ('sent_at', 'expire_at')
         }),
     )
+    
+    def user_email(self, obj):
+        return obj.user.email
+    user_email.short_description = _('User Email')
+    
+    def is_expired_display(self, obj):
+        return obj.is_expired()
+    is_expired_display.short_description = _('Is Expired')
+    is_expired_display.boolean = True
+
+
+@admin.register(PasswordResetCodesModel)
+class PasswordResetCodesModelAdmin(admin.ModelAdmin):
+    list_display = [
+        'user_email',
+        'code', 
+        'sent_at',
+        'expire_at',
+        'is_expired_display'
+    ]
+    
+    list_filter = [
+        'sent_at',
+        'expire_at'
+    ]
+    
+    search_fields = [
+        'user__email',
+        'code'
+    ]
+    
+    readonly_fields = ['sent_at', 'expire_at']
     
     def user_email(self, obj):
         return obj.user.email

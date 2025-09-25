@@ -117,3 +117,34 @@ class VerifiedCodesModel(models.Model):
             from datetime import timedelta
             self.expire_at = timezone.now() + timedelta(minutes=10)
         super().save(*args, **kwargs)
+
+
+class PasswordResetCodesModel(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        related_name="password_reset_code",
+        verbose_name=_("user"),
+        on_delete=models.CASCADE
+    )
+    code = models.CharField(_("reset code"), max_length=6)
+    sent_at = models.DateTimeField(_("sent at"), auto_now_add=True)
+    expire_at = models.DateTimeField(_("expire at"))
+
+    class Meta:
+        verbose_name = _("Password Reset Code")
+        verbose_name_plural = _("Password Reset Codes")
+
+    def is_expired(self):
+        """Проверяет истек ли срок действия кода"""
+        from django.utils import timezone
+        return timezone.now() > self.expire_at
+
+    def save(self, *args, **kwargs):
+        if not self.expire_at:
+            from django.utils import timezone
+            from datetime import timedelta
+            self.expire_at = timezone.now() + timedelta(minutes=10)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Reset code for {self.user.email}"
