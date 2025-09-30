@@ -1,7 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="bec9f255-3733-41dc-9700-244e5b5aebe4" name="Default Changelist" comment="" />
+    <list default="true" id="bec9f255-3733-41dc-9700-244e5b5aebe4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Classroom.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Classroom.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classroom/apps/authorization/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/classroom/apps/authorization/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classroom/apps/authorization/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/classroom/apps/authorization/services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classroom/apps/authorization/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/classroom/apps/authorization/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classroom/apps/authorization/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/classroom/apps/authorization/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classroom/apps/course/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/classroom/apps/course/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classroom/apps/course/fields.py" beforeDir="false" afterPath="$PROJECT_DIR$/classroom/apps/course/fields.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classroom/apps/course/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/classroom/apps/course/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classroom/apps/enums.py" beforeDir="false" afterPath="$PROJECT_DIR$/classroom/apps/enums.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classroom/apps/notifications/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/classroom/apps/notifications/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classroom/apps/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/classroom/apps/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classroom/classroom/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/classroom/classroom/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classroom/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/classroom/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -14,17 +32,23 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectId" id="32omxUvGlCVvJs2AGzwId1i7Iql" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
-  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "last_opened_file_path": "C:/BackendClassroom",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  }
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Дмитрий\Desktop\Classroom\classroom\apps" />
@@ -40,5 +64,16 @@
       <updated>1758095546089</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

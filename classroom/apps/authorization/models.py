@@ -3,21 +3,20 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, AbstractUser
-from django.conf import settings
+from django.utils import timezone
 
+from datetime import timedelta
 from functools import partial
 
 from .managers import CustomUserManager
+
 from apps.utils import file_upload_path
+from apps.enums import Roles
 
-
+from classroom.settings import AUTH_USER_MODEL
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    class Role(models.IntegerChoices):
-        STUDENT = 0, _('Student')
-        TEACHER = 1, _('Teacher')
-        ADMIN = 2, _('Administrator')
 
     first_name = models.CharField(_("first name"), max_length=150, blank=True)
     second_name = models.CharField(_("second name"), max_length=150, blank=True)
@@ -32,7 +31,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ]
     )
 
-    role_id = models.PositiveSmallIntegerField(_("role"), choices=Role, default=Role.STUDENT)
+    role_id = models.PositiveSmallIntegerField(_("role"), choices=Roles, default=Roles.STUDENT)
     email = models.EmailField(_("email address"), unique=True, blank=True)
 
     is_active = models.BooleanField(
@@ -61,19 +60,19 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     @property
     def role_name(self):
-        return self.Role(self.role_id).name
+        return Roles(self.role_id).name
 
     @property
     def is_student(self):
-        return self.role_id == self.Role.STUDENT
+        return self.role_id == Roles.STUDENT
 
     @property
     def is_teacher(self):
-        return self.role_id == self.Role.TEACHER
+        return self.role_id == Roles.TEACHER
 
     @property
     def is_admin(self):
-        return self.role_id == self.Role.ADMIN
+        return self.role_id == Roles.ADMIN
 
     @property
     def is_staff(self):
@@ -91,60 +90,63 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
-class VerifiedCodesModel(models.Model):
+class ExpiredCodesAbstractModel(models.Model):
+    EXPIRE_MINUTES = 5
+
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
+        AUTH_USER_MODEL,
+        related_name="code",
+        verbose_name=_("user"),
+        on_delete=models.CASCADE
+    )
+    code = models.CharField(_("code"), max_length=6)
+    sent_at = models.DateTimeField(_("sent at"), auto_now_add=True)
+    expire_at = models.DateTimeField(_("expire at"))
+
+
+    def is_expired(self):
+        """Проверяет истек ли срок действия кода"""
+        return timezone.now() > self.expire_at
+
+    def save(self, *args, **kwargs):
+        if not self.expire_at:
+            self.expire_at = timezone.now() + timedelta(minutes=self.EXPIRE_MINUTES)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        abstract = True
+
+class VerifiedCodesModel(ExpiredCodesAbstractModel):
+
+    user = models.OneToOneField(
+        AUTH_USER_MODEL,
         related_name="verification_code",
         verbose_name=_("user"),
         on_delete=models.CASCADE
     )
     code = models.CharField(_("verification code"), max_length=6)
-    sent_at = models.DateTimeField(_("sent at"), auto_now_add=True)
-    expire_at = models.DateTimeField(_("expire at"))
 
     class Meta:
         verbose_name = _("Verification Code")
         verbose_name_plural = _("Verification Codes")
 
-    def is_expired(self):
-        """Проверяет истек ли срок действия кода"""
-        from django.utils import timezone
-        return timezone.now() > self.expire_at
-
-    def save(self, *args, **kwargs):
-        if not self.expire_at:
-            from django.utils import timezone
-            from datetime import timedelta
-            self.expire_at = timezone.now() + timedelta(minutes=10)
-        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"Verification code for {self.user.email}"
 
 
-class PasswordResetCodesModel(models.Model):
+class PasswordResetCodesModel(ExpiredCodesAbstractModel):
+
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
+        AUTH_USER_MODEL,
         related_name="password_reset_code",
         verbose_name=_("user"),
         on_delete=models.CASCADE
     )
     code = models.CharField(_("reset code"), max_length=6)
-    sent_at = models.DateTimeField(_("sent at"), auto_now_add=True)
-    expire_at = models.DateTimeField(_("expire at"))
 
     class Meta:
         verbose_name = _("Password Reset Code")
         verbose_name_plural = _("Password Reset Codes")
-
-    def is_expired(self):
-        """Проверяет истек ли срок действия кода"""
-        from django.utils import timezone
-        return timezone.now() > self.expire_at
-
-    def save(self, *args, **kwargs):
-        if not self.expire_at:
-            from django.utils import timezone
-            from datetime import timedelta
-            self.expire_at = timezone.now() + timedelta(minutes=10)
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Reset code for {self.user.email}"

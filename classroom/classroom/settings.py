@@ -62,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    'classroom.middleware.DisableCSRFForAPI', # TEST
 ]
 
 ROOT_URLCONF = 'classroom.urls'
@@ -149,33 +150,31 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-"""REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination', # Pagination
-    'PAGE_SIZE': 20,
-    'DEFAULT_PERMISSION_CLASSES': [
-        'apps.authorization.permissions.IsVerified',  # Verification
-    ],
-}"""
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',  # Для тестирования
+        'rest_framework.authentication.SessionAuthentication',  # Для сессий
+        'rest_framework.authentication.BasicAuthentication',    # Для тестирования
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',  # Временно для тестирования
+        'apps.authorization.permissions.IsVerified',  # Требует верификации (подтверждения аккаунта)
+        'rest_framework.permissions.IsAuthenticated',  # Требует аутентификации
     ],
 }
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # для тестов
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # для готового приложения
-""""
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.' # адрес почтового сервера
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.yandex.ru' # адрес почтового сервера
 EMAIL_PORT = 587
+EMAIL_USE_SSL = False
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = '' # почта для отправки
-EMAIL_HOST_PASSWORD = ''  # пароль почты
-DEFAULT_FROM_EMAIL = '' # почта, которую увидят получатели 
-"""
+EMAIL_HOST_USER = '<ваша почта>' # почта для отправки
+EMAIL_HOST_PASSWORD = '<пароль>'  # пароль почты
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER # почта, которую увидят получатели 
+SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
