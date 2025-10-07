@@ -42,8 +42,8 @@ class CoursePostThroughInline(admin.TabularInline):
 class CoursesAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'section', 'room_number', 'creator', 'config_permission', 'delete_permission', 'is_archive', 'created_at')
     list_filter = ('is_archive', 'config_permission', 'delete_permission', 'created_at')
-    search_fields = ('id', 'title', 'section', 'room_number', 'theme', 'inv_code', 'course_id_base', 'creator__username')
-    readonly_fields = ('id', 'created_at', 'inv_code', 'course_id_base')
+    search_fields = ('id', 'title', 'section', 'room_number', 'theme', 'inv_code', 'creator__username')
+    readonly_fields = ('id', 'created_at', 'inv_code')
     fieldsets = (
         (None, {
             'fields': ('id', 'title', 'description', 'section', 'room_number', 'theme', 'image')
@@ -52,7 +52,7 @@ class CoursesAdmin(admin.ModelAdmin):
             'fields': ('config_permission', 'delete_permission')
         }),
         (_('Metadata'), {
-            'fields': ('creator', 'inv_code', 'course_id_base', 'created_at', 'is_archive')
+            'fields': ('creator', 'inv_code', 'created_at', 'is_archive')
         }),
     )
     inlines = [CourseTeachersThroughInline, CourseStudentsThroughInline, CoursePostThroughInline]
