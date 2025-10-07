@@ -16,7 +16,6 @@ from .models import Courses
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Courses.objects.select_related("creator")
     permission_classes = [permissions.IsAuthenticated]
-    lookup_field = "course_id_base"
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['title', 'section', 'theme', 'is_archive']
 
