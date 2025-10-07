@@ -25,7 +25,6 @@ class Courses(models.Model):
     room_number = models.CharField(_("room"), max_length=20, blank=True, null=True)
     theme = models.CharField(_("theme"), max_length=25, blank=True, null=True)
     inv_code = models.CharField(_("invite code"), max_length=8, blank=True, null=True)
-    course_id_base = models.CharField(_("course id"), unique=True, max_length=32)
     config_permission = models.PositiveSmallIntegerField(
         _("config perm"),
         choices=ConfigPermissions,
